@@ -12,7 +12,7 @@
         <AnchorPane prefHeight="400.0" prefWidth="868.0" style="-fx-background-color: #fafafa;">
             <children>
                 <Label fx:id="error_input_label" layoutX="147.0" layoutY="130.0" text="Неверный логин или пароль" textFill="WHITE" />
-            <TableView layoutX="14.0" layoutY="14.0" prefHeight="268.0" prefWidth="630.0">
+            <TableView fx:id="threadsTable" layoutX="14.0" layoutY="14.0" prefHeight="268.0" prefWidth="630.0">
               <columns>
                 <TableColumn fx:id="threadNumColId" prefWidth="75.0" text="Номер потока" />
                 <TableColumn fx:id="defaultQueueColId" prefWidth="75.0" text="Начальная очередь" />
