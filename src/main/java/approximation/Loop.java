@@ -1,6 +1,7 @@
 package approximation;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Loop {
@@ -117,6 +118,8 @@ public class Loop {
     public void setAllDeltaThreadStat(ArrayList<ArrayList<Double>> allDeltaThreadStat) {
         this.allDeltaThreadStat = allDeltaThreadStat;
     }
+
+
 
     public void start(int numOfIterations) throws CloneNotSupportedException {
         boolean flag = false;
@@ -319,34 +322,38 @@ public class Loop {
 //            k++;
 //            System.out.println("______________________");
 //        }
-//        for (int i = 0; i < numOfThreads; i++) {
-//            arr[i] += threads.get(i).getQueue();
-//            System.out.println("ДЛЯ СРЕДНЕЙ ОЧЕРЕДИ:" + arr[i]);
-//            this.avgQueues.set(i, (double) (arr[i] / numOfIterations));
-//            System.out.println("СРЕДНЯЯ ОЧЕРЕДЬ ЗА " + numOfIterations + " ИТЕРИЦИЙ: " + avgQueues.get(i));
-//        }
-//        double sumLambda = 0.0;
-//        for (int i = 0; i < numOfThreads; i++) {
-//            param += threads.get(i).getLambda() * arr[i] / numOfIterations;
-//            sumLambda += threads.get(i).getLambda();
-//        }
-//        param /= sumLambda; //синтетическая характеристика для сравнивания
-//        System.out.println("Стационарность была достигнута на " + iter + " итерации");
-//        System.out.println("Число заходов в петлю " + loopIter);
-//        System.out.println("За " + numOfIterations + " получили ряды: ");
+        for (int i = 0; i < numOfThreads; i++) {
+            arr[i] += threads.get(i).getQueue();
+            System.out.println("ДЛЯ СРЕДНЕЙ ОЧЕРЕДИ:" + arr[i]);
+            this.avgQueues.set(i, (double) (arr[i] / numOfIterations));
+            System.out.println("СРЕДНЯЯ ОЧЕРЕДЬ ЗА " + numOfIterations + " ИТЕРИЦИЙ: " + avgQueues.get(i));
+        }
+        double sumLambda = 0.0;
+        for (int i = 0; i < numOfThreads; i++) {
+            param += threads.get(i).getLambda() * arr[i] / numOfIterations;
+            sumLambda += threads.get(i).getLambda();
+        }
+        param /= sumLambda; //синтетическая характеристика для сравнивания
+        System.out.println("Стационарность была достигнута на " + iter + " итерации");
+        System.out.println("Число заходов в петлю " + loopIter);
+        System.out.println("За " + numOfIterations + " получили ряды: ");
 
-//        System.out.println("по дельтам вывод обслуженных:");
-//        for(Thread th: threads){
-//            System.out.println(Arrays.toString(th.getRealDoneAppsStats()));
-//        }
-//        System.out.println("по дельтам вывод обслуженных за итерации:");
-//        for (Thread th: threads){
-//            for (int i = 0; i<th.getNumOfPoints()+1;i++){
-//                th.getRealDoneAppsStats()[i]/=numOfIterations;
-//                        //.set(i, th.getRealDoneAppsStats().get(i)/numOfIterations);
-//            }
-//            System.out.println(Arrays.toString(th.getRealDoneAppsStats()));
-//        }
+        System.out.println("по дельтам вывод обслуженных:");
+        for(Thread th: threads){
+            System.out.println(Arrays.toString(th.getRealDoneAppsStats()));
+        }
+
+
+
+
+        System.out.println("по дельтам вывод обслуженных за итерации:");
+        for (Thread th: threads){
+            for (int i = 0; i<th.getNumOfPoints()+1;i++){
+                th.getRealDoneAppsStats()[i]/=numOfIterations;
+                        //.set(i, th.getRealDoneAppsStats().get(i)/numOfIterations);
+            }
+            System.out.println(Arrays.toString(th.getRealDoneAppsStats()));
+        }
         for (ArrayList<Double> elem : deltaStats) {
             for (int i = 0; i < elem.size(); i++) {
                 elem.set(i, elem.get(i) / numOfIterations);
@@ -412,8 +419,8 @@ public class Loop {
     public static void main(String[] args) throws CloneNotSupportedException {
         List<Thread> list = new ArrayList<>();
         list.add(new Thread(1, 1, 0.01, 10.0, new Formula("3"), 5, 0));
-        list.add(new Thread(1, 20, 1.0, 10.0, new Formula("x^2"), 6, 9));
-        list.add(new Thread(1, 40, 1.0, 10.0, new Formula("x^2"), 7, 9));
+        list.add(new Thread(1, 10, 0.3, 10.0, new Formula("-0.6x+7.4"), 5, 9));
+        list.add(new Thread(1, 30, 1.0, 10.0, new Formula("-0.6x+7.4"), 5, 9));
         double tfo = 0.1;
         Loop loop = new Loop((ArrayList<Thread>) list, 9.0, tfo);
         loop.start(3);

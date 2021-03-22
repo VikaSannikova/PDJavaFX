@@ -43,17 +43,26 @@ public class NewThreadController {
     @FXML
     void initialize() {
         addThreadButtonId.setOnAction(actionEvent -> {
-            int id = Integer.parseInt(threadNumberTfId.getText());
-            int queue  = Integer.parseInt(queueTfId.getText());
-            double lambda = Integer.parseInt(lambdaTfId.getText());
-            double greenTime = Double.parseDouble(greenTimeTfId.getText());
-            Formula formula = new Formula(muTfId.getText());
-            double yellowTime = Double.parseDouble(yellowTimeTfId.getText());
-            int numOfPoints = 9;
-            new_thread = new Thread(id, queue, lambda, greenTime, formula, yellowTime, numOfPoints);
-            System.out.println("добавлен!");
-            Stage stage = (Stage) addThreadButtonId.getScene().getWindow();
-            stage.close();
+            try {
+                int id = Integer.parseInt(threadNumberTfId.getText());
+                int queue  = Integer.parseInt(queueTfId.getText());
+                double lambda = Double.parseDouble(lambdaTfId.getText());
+                double greenTime = Double.parseDouble(greenTimeTfId.getText());
+                Formula formula = new Formula(muTfId.getText());
+                double yellowTime = Double.parseDouble(yellowTimeTfId.getText());
+                int numOfPoints = 9;
+                if (id == 0) {
+                    new_thread = new Thread(id, queue, lambda, greenTime, formula, yellowTime, 0);
+                } else {
+                    new_thread = new Thread(id, queue, lambda, greenTime, formula, yellowTime, numOfPoints);
+                }
+
+                System.out.println("добавлен!");
+                Stage stage = (Stage) addThreadButtonId.getScene().getWindow();
+                stage.close();
+            } catch (Exception ex) {
+                System.out.println("Какое-то из полей пустое");
+            }
         });
     }
 
