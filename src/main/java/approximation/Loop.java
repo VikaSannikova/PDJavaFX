@@ -140,8 +140,8 @@ public class Loop {
         System.out.println(stats); // статистики, размер 3, длина каждого равна максимальному числу обслуженных заявок
         System.out.println("**************************");
 
-        Integer arr[] = new Integer[threads.size()]; //считает суммму по полным очередям
-        Integer arrZero[] = new Integer[threadsZero.size()]; //считает сумму по нулевым очередям
+        Integer[] arr = new Integer[threads.size()]; //считает суммму по полным очередям
+        Integer[] arrZero = new Integer[threadsZero.size()]; //считает сумму по нулевым очередям
 
         ArrayList<Double> greenTimes = new ArrayList<>(); //зеленые света
         ArrayList<Double> yellowTimes = new ArrayList<>(); // желтые света
@@ -270,7 +270,7 @@ public class Loop {
             double param = 0.0;
             double paramZero = 0.0;
             double sumLambda = 0.0;
-            for (int i = 0; i < numOfThreads; i++) { //TODO
+            for (int i = 0; i < numOfThreads; i++) {
                 System.out.println(threads.get(i).getLambda() * arr[i] / (p + 1));
                 param += threads.get(i).getLambda() * arr[i] / (p + 1);
                 paramZero += threadsZero.get(i).getLambda() * arrZero[i] / (p + 1);
@@ -394,7 +394,7 @@ public class Loop {
 
     }
 
-    public void check() { //спросить на счет проверки, не меняются ли условия
+    public void check() { //todo спросить на счет проверки, не меняются ли условия
         System.out.println();
         double sumTime = 0;
         for (Thread thr : threads) {

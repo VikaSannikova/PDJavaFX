@@ -8,15 +8,22 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
+import javafx.scene.control.*;
 import javafx.scene.control.Button;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
+import javax.swing.*;
+import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Objects;
@@ -137,8 +144,71 @@ public class Controller {
             str = "Очереди: " + avgQueues;
             queuesId.setText(str);
             loopGeneral[0].check();
+        });
+        drawStatisticGraphicsButtonId.setOnAction( actionEvent -> {
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(Objects.requireNonNull(getClass().getClassLoader().getResource("linechart.fxml")));
+            try {
+                loader.load();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
+
+            XYChart.Series<Integer, Integer> series = new XYChart.Series<Integer, Integer>();
+            series.setName("My Data");
+            for (int x = 0; x < 100; ++x) {
+                series.getData().add(new XYChart.Data<>(x, x * x));
+            }
+
+            LineChartController lineChartController = loader.getController();
+            lineChartController.setSeries(series);
+
+            Parent root = loader.getRoot();
+            Dialog dialog = new Dialog();
+            dialog.getDialogPane().setContent(root);
+            dialog.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
+            Node closeButton = dialog.getDialogPane().lookupButton(ButtonType.CLOSE);
+            closeButton.managedProperty().bind(closeButton.visibleProperty());
+            closeButton.setVisible(false);
+
+            dialog.show();
 
         });
+
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 }
