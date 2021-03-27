@@ -8,22 +8,26 @@ import javafx.scene.chart.XYChart;
 
 public class LineChartController {
 
-    XYChart.Series<Integer, Integer> series;
+    XYChart.Series<Integer, Double> [] series;
 
-    public XYChart.Series<Integer, Integer> getSeries() {
+    public XYChart.Series<Integer, Double>[] getSeries() {
         return series;
     }
 
-    public void setSeries(XYChart.Series<Integer, Integer> series) {
+    public void setSeries(XYChart.Series<Integer, Double>[] series) {
         this.series = series;
-        stationarityChartId.getData().add(series);
+        for (XYChart.Series<Integer, Double> ser: series
+             ) {
+            stationarityChartId.getData().add(ser);
+        }
+//        stationarityChartId.getData().add(series);
     }
 
     @FXML
-    LineChart<Integer, Integer> stationarityChartId;
+    LineChart<Integer, Double> stationarityChartId;
 
     @FXML
     void initialize() {
-        stationarityChartId.setTitle("LineChart");
+        stationarityChartId.setTitle("Визуализация достижения стационарности");
     }
 }

@@ -154,13 +154,32 @@ public class Controller {
                 e.printStackTrace();
             }
 
-
-
-            XYChart.Series<Integer, Integer> series = new XYChart.Series<Integer, Integer>();
-            series.setName("My Data");
-            for (int x = 0; x < 100; ++x) {
-                series.getData().add(new XYChart.Data<>(x, x * x));
+            int rowCount = threadsTable.getItems().size();
+            XYChart.Series <Integer, Double> []series = new XYChart.Series[2 + rowCount];
+            series[0] = new XYChart.Series <Integer, Double>();
+            series[0].setName("Нулевая");
+            series[1] = new XYChart.Series <Integer, Double>();
+            series[1].setName("Наибольшая");
+            for(int i = 2; i < series.length; i++){
+                String str = (i-1) + " очередь";
+                series[i] = new XYChart.Series <Integer, Double>();
+                series[i].setName(str);
             }
+            for(int i = 0; i < iterationCount; i++){
+                series[0].getData().add(new XYChart.Data<Integer, Double>(i, loopGeneral[0].getSintZero().get(i)));
+                series[1].getData().add(new XYChart.Data<Integer, Double>(i, loopGeneral[0].getSintInf().get(i)));
+                for(int j = 2; j < series.length; j++){
+                    series[j].getData().add(new XYChart.Data<Integer, Double>(i, loopGeneral[0].getThreadsQ().get(j-2).get(i)));
+                }
+            }
+
+
+
+//            XYChart.Series<Integer, Integer> series = new XYChart.Series<Integer, Integer>();
+//            series.setName("My Data");
+//            for (int x = 0; x < 100; ++x) {
+//                series.getData().add(new XYChart.Data<>(x, x * x));
+//            }
 
             LineChartController lineChartController = loader.getController();
             lineChartController.setSeries(series);
