@@ -103,6 +103,11 @@ public class Controller {
         muColId.setCellValueFactory(new PropertyValueFactory<>("formula"));
         yellowTimeColId.setCellValueFactory(new PropertyValueFactory<>("yellowTime"));
 
+        threads.add(new Thread(0,0,0.01,10, new Formula("5"),5, 0 ));
+        threads.add(new Thread(1, 10, 0.3, 10, new Formula("-0.6x+7.4"), 5, 9));
+        threads.add(new Thread(2, 40, 1, 10, new Formula("-0.6x+7.4"), 5, 9));
+        threadsTable.setItems(threads);
+
         addButtonId.setOnAction(actionEvent -> {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(Objects.requireNonNull(getClass().getClassLoader().getResource("newThread.fxml")));
@@ -119,6 +124,7 @@ public class Controller {
             dialog.showAndWait();
             threads.add(newThreadController.getNew_thread());
             threadsTable.setItems(threads);
+            startButtonId.setDisable(false);
         });
 
         final Loop[] loopGeneral = new Loop[1];
@@ -129,7 +135,8 @@ public class Controller {
 
             loopGeneral[0] = new Loop( new ArrayList<Thread>(threadsTable.getItems()), loopTime, oneRequestTime);
             try {
-                loopGeneral[0].start(iterationCount);
+                loopGeneral[0].
+                        start(iterationCount);
             } catch (CloneNotSupportedException e1) {
                 e1.printStackTrace();
             }
@@ -144,6 +151,9 @@ public class Controller {
             str = "Очереди: " + avgQueues;
             queuesId.setText(str);
             loopGeneral[0].check();
+            drawStatisticGraphicsButtonId.setDisable(false);
+            statisticSeriesButtonId.setDisable(false);
+            manyStatisticSeriesButtonId.setDisable(false);
         });
         drawStatisticGraphicsButtonId.setOnAction( actionEvent -> {
             FXMLLoader loader = new FXMLLoader();
@@ -172,15 +182,6 @@ public class Controller {
                     series[j].getData().add(new XYChart.Data<Integer, Double>(i, loopGeneral[0].getThreadsQ().get(j-2).get(i)));
                 }
             }
-
-
-
-//            XYChart.Series<Integer, Integer> series = new XYChart.Series<Integer, Integer>();
-//            series.setName("My Data");
-//            for (int x = 0; x < 100; ++x) {
-//                series.getData().add(new XYChart.Data<>(x, x * x));
-//            }
-
             LineChartController lineChartController = loader.getController();
             lineChartController.setSeries(series);
 
@@ -191,8 +192,44 @@ public class Controller {
             Node closeButton = dialog.getDialogPane().lookupButton(ButtonType.CLOSE);
             closeButton.managedProperty().bind(closeButton.visibleProperty());
             closeButton.setVisible(false);
-
             dialog.show();
+        });
+
+        statisticSeriesButtonId.setOnAction(actionEvent -> {
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(Objects.requireNonNull(getClass().getClassLoader().getResource("barchart.fxml")));
+            try {
+                loader.load();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            int rowCount = threadsTable.getItems().size();
+            XYChart.Series<String , Double>[] series = new XYChart.Series[rowCount-1];
+            for(int k = 1; k < threadsTable.getItems().size(); k++){
+                series[k-1] = new XYChart.Series <String , Double>();
+                series[k-1].setName(String.valueOf(k));
+                for(int i = 0; i < loopGeneral[0].getStats().get(k).size();i++) {
+                    String str = String.valueOf(i);
+                    series[k-1].getData().add(new XYChart.Data<String, Double>(str, loopGeneral[0].getStats().get(k).get(i)));
+                }
+            }
+
+            BarChartController barChartController = loader.getController();
+            barChartController.setSeries(series);
+
+
+            Parent root = loader.getRoot();
+            Dialog dialog = new Dialog();
+            dialog.getDialogPane().setContent(root);
+            dialog.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
+            Node closeButton = dialog.getDialogPane().lookupButton(ButtonType.CLOSE);
+            closeButton.managedProperty().bind(closeButton.visibleProperty());
+            closeButton.setVisible(false);
+            dialog.show();
+
+
+
 
         });
 

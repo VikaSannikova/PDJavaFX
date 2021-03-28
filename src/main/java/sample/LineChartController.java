@@ -16,11 +16,9 @@ public class LineChartController {
 
     public void setSeries(XYChart.Series<Integer, Double>[] series) {
         this.series = series;
-        for (XYChart.Series<Integer, Double> ser: series
-             ) {
+        for (XYChart.Series<Integer, Double> ser: series) {
             stationarityChartId.getData().add(ser);
         }
-//        stationarityChartId.getData().add(series);
     }
 
     @FXML

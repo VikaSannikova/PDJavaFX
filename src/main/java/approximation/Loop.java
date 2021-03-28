@@ -422,8 +422,8 @@ public class Loop {
         list.add(new Thread(1, 10, 0.3, 10.0, new Formula("-0.6x+7.4"), 5, 9));
         list.add(new Thread(1, 30, 1.0, 10.0, new Formula("-0.6x+7.4"), 5, 9));
         double tfo = 0.1;
-        Loop loop = new Loop((ArrayList<Thread>) list, 9.0, tfo);
-        loop.start(3);
+        Loop loop = new Loop((ArrayList<Thread>) list, 10.0, tfo);
+        loop.start(100);
         loop.check();
         System.out.println("Частоты для дельт");
         for (ArrayList<Double> arr : loop.deltaStats) {

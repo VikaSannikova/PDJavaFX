@@ -56,7 +56,6 @@ public class NewThreadController {
                 } else {
                     new_thread = new Thread(id, queue, lambda, greenTime, formula, yellowTime, numOfPoints);
                 }
-
                 System.out.println("добавлен!");
                 Stage stage = (Stage) addThreadButtonId.getScene().getWindow();
                 stage.close();
