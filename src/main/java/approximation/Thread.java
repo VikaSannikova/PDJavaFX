@@ -2,9 +2,7 @@ package approximation;
 
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
-import java.util.Queue;
 
 public class Thread implements Cloneable {
     int id; // номер потока
@@ -25,8 +23,9 @@ public class Thread implements Cloneable {
     int[] realDoneAppsStats; // статистика??? изначально 0, размер зависит от числа точек разрыва
     double timeForOne; // время на обслуживание одной заявки
     LinkedList<Request> all_requests;
-    double avg_time;
-    int all_requesrs_in_system;
+    double allTimeServedRequests;
+    double avgTime;
+    int all_requests_in_system;
 
     public LinkedList<Request> getAll_requests() {
         return all_requests;
@@ -54,8 +53,9 @@ public class Thread implements Cloneable {
             all_requests.add(new Request(0.0));
         }
         System.out.println("начальное время заявок " + all_requests);
-        this.avg_time = 0.0;
-        this.all_requesrs_in_system = 0;
+        this.allTimeServedRequests = 0.0;
+        this.all_requests_in_system = 0;
+        this.avgTime = 0.0;
     }
 
     public double getCurrentTime() {
@@ -78,12 +78,28 @@ public class Thread implements Cloneable {
         return timeForOne;
     }
 
-    public double getAvg_time() {
-        return avg_time;
+    public double getAllTimeServedRequests() {
+        return allTimeServedRequests;
     }
 
-    public void setAvg_time(double avg_time) {
-        this.avg_time = avg_time;
+    public void setAllTimeServedRequests(double allTimeServedRequests) {
+        this.allTimeServedRequests = allTimeServedRequests;
+    }
+
+    public double getAvgTime() {
+        return avgTime;
+    }
+
+    public void setAvgTime(double avgTime) {
+        this.avgTime = avgTime;
+    }
+
+    public int getAll_requests_in_system() {
+        return all_requests_in_system;
+    }
+
+    public void setAll_requests_in_system(int all_requests_in_system) {
+        this.all_requests_in_system = all_requests_in_system;
     }
 
     public int getId() {
@@ -266,9 +282,10 @@ public class Thread implements Cloneable {
         System.out.println("Могло быть обслужено " + this.maxDoneApps + " заявок");
         System.out.println("Общее время: " + TIME);
         System.out.println("Всего в ОУ было замечено заявок: " + (this.realDoneApps + this.queue));
-        avg_time +=TIME; // время тех, что вышли из системы
-        all_requesrs_in_system += this.realDoneApps; //делить на обслуженные
-        System.out.println("Среднее время пребывания заявок по потоку: " + this.avg_time/(this.all_requesrs_in_system));
+        allTimeServedRequests +=TIME; // время тех, что вышли из системы
+        all_requests_in_system += this.realDoneApps; //делить на обслуженные
+        avgTime = this.allTimeServedRequests /(this.all_requests_in_system);
+        System.out.println("Среднее время пребывания заявок по потоку: " + avgTime);
     }
 
 

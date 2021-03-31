@@ -28,7 +28,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Objects;
 
-public class Controller {
+public class MainController {
     ObservableList<Thread> threads = FXCollections.observableArrayList();
     double loopTime;
     int iterationCount;
@@ -95,6 +95,9 @@ public class Controller {
     private Label queuesId;
 
     @FXML
+    private Label avgTimesId;
+
+    @FXML
     void initialize() {
         threadNumColId.setCellValueFactory(new PropertyValueFactory<>("id"));
         defaultQueueColId.setCellValueFactory(new PropertyValueFactory<>("queue"));
@@ -144,12 +147,15 @@ public class Controller {
             int iter = loopGeneral[0].getIter();
             int yellowIter = loopGeneral[0].getLoopIter();
             ArrayList<Double> avgQueues = loopGeneral[0].getAvgQueues();
+            ArrayList<String> avgTimes = loopGeneral[0].getAvgTimes();
             str = "Стационарность достигнута: " + Integer.toString(iter);
             stationaityId.setText(str);
             str = "Число заходов в петлю: " + Integer.toString(yellowIter);
             loopYellowCounId.setText(str);
             str = "Очереди: " + avgQueues;
             queuesId.setText(str);
+            str = "Среднее время: " + avgTimes;
+            avgTimesId.setText(str);
             loopGeneral[0].check();
             drawStatisticGraphicsButtonId.setDisable(false);
             statisticSeriesButtonId.setDisable(false);
@@ -206,7 +212,7 @@ public class Controller {
 
             int rowCount = threadsTable.getItems().size();
             XYChart.Series<String , Double>[] series = new XYChart.Series[rowCount-1];
-            for(int k = 1; k < threadsTable.getItems().size(); k++){
+            for(int k = 1; k < rowCount; k++){
                 series[k-1] = new XYChart.Series <String , Double>();
                 series[k-1].setName(String.valueOf(k));
                 for(int i = 0; i < loopGeneral[0].getStats().get(k).size();i++) {
@@ -218,6 +224,38 @@ public class Controller {
             BarChartController barChartController = loader.getController();
             barChartController.setSeries(series);
 
+            Parent root = loader.getRoot();
+            Dialog dialog = new Dialog();
+            dialog.getDialogPane().setContent(root);
+            dialog.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
+            Node closeButton = dialog.getDialogPane().lookupButton(ButtonType.CLOSE);
+            closeButton.managedProperty().bind(closeButton.visibleProperty());
+            closeButton.setVisible(false);
+            dialog.show();
+        });
+
+        manyStatisticSeriesButtonId.setOnAction(actionEvent -> {
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(Objects.requireNonNull(getClass().getClassLoader().getResource("barchart.fxml")));
+            try {
+                loader.load();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            int rowCount = threadsTable.getItems().size();
+            XYChart.Series<String , Double>[] series = new XYChart.Series[rowCount-1];
+            for(int k = 1; k < rowCount; k++){
+                series[k-1] = new XYChart.Series <String , Double>();
+                series[k-1].setName(String.valueOf(k));
+                for(int i = 0; i < loopGeneral[0].getAllDeltaThreadStat().get(k).size(); i++){
+                    String str = String.valueOf(i);
+                    series[k-1].getData().add(new XYChart.Data<>(str,loopGeneral[0].getAllDeltaThreadStat().get(k).get(i)));
+                }
+            }
+
+            BarChartController barChartController = loader.getController();
+            barChartController.setSeries(series);
 
             Parent root = loader.getRoot();
             Dialog dialog = new Dialog();
@@ -227,10 +265,6 @@ public class Controller {
             closeButton.managedProperty().bind(closeButton.visibleProperty());
             closeButton.setVisible(false);
             dialog.show();
-
-
-
-
         });
 
     }

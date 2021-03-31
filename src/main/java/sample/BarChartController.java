@@ -17,16 +17,6 @@ public class BarChartController {
         for (XYChart.Series<String , Double> ser: series) {
             barChartId.getData().add(ser);
         }
-        for(Node n: barChartId.lookupAll(".default-color0.chart-bar")) {
-            n.setStyle("-fx-bar-fill: green;");
-        }
-//        for(Node n: barChartId.lookupAll(".default-color1.chart-bar")) {
-//            n.setStyle("-fx-bar-fill: green;");
-//        }
-        for (Node n : barChartId.lookupAll(".default-color0.charts-bar-symbol")) {
-            n.setStyle("-fx-bar-fill: green;");
-        }
-
     }
 
     @FXML
@@ -37,18 +27,6 @@ public class BarChartController {
         barChartId.setTitle("Статистический ряд за целый зеленый свет");
         System.out.println(barChartId.getCategoryGap());
         barChartId.setCategoryGap(1);
-//        for(Node n: barChartId.lookupAll(".default-color0.chart-bar")) {
-//            n.setStyle("-fx-bar-fill: blue;");
-//        }
-//        for(Node n: barChartId.lookupAll(".default-color1.chart-bar")) {
-//            n.setStyle("-fx-bar-fill: red;");
-//        }
-
-//        for(Node n: barChartId.lookupAll(".default-color0.charts-bar-symbol")) {
-//            n.setStyle("-fx-bar-fill: blue;");
-//        }
-//        for(Node n: barChartId.lookupAll("default-color0.chart-bar-symbol")) {
-//            n.setStyle("-fx-bar-fill: green;");
-//        }
+        barChartId.setCategoryGap(1);
     }
 }

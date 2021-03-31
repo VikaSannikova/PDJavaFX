@@ -1,5 +1,6 @@
 package approximation;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -10,6 +11,7 @@ public class Loop {
     Double loopTime; //время петли
     Double param;
     ArrayList<Double> avgQueues = new ArrayList<>(); //средние очереди по потокам
+    ArrayList<String> avgTimes = new ArrayList<>(); //средние времена по потокам
     int iter; //итерация переходного процесса
     int loopIter; //число заходов в петлю
     ArrayList<ArrayList<Double>> stats = new ArrayList<>();
@@ -29,6 +31,7 @@ public class Loop {
         this.param = 0.0;
         for (int i = 0; i < threads.size(); i++) { // средние очереди по потокам 0
             this.avgQueues.add(0.0);
+            this.avgTimes.add("");
         }
         this.iter = 0;
         this.loopIter = 0;
@@ -69,6 +72,14 @@ public class Loop {
 
     public ArrayList<Double> getAvgQueues() {
         return avgQueues;
+    }
+
+    public void setAvgQueues(ArrayList<Double> avgQueues) {
+        this.avgQueues = avgQueues;
+    }
+
+    public ArrayList<String> getAvgTimes() {
+        return avgTimes;
     }
 
     public int getIter() {
@@ -253,8 +264,8 @@ public class Loop {
                 System.out.println("Очередь " + i + " потока = " + threads.get(i).getQueue() + " после желтого света " + (numOfThreads - 1));
             }
             System.out.print("Очереди на новое начало цикла: ");
-            for (int i = 0; i < numOfThreads; i++) {
-                System.out.print(threads.get(i).getQueue() + ", ");
+            for (Thread thread : threads) {
+                System.out.print(thread.getQueue() + ", ");
             }
             System.out.print("Очереди на новое начало цикла ZERO: ");
             for (int i = 0; i < numOfThreads; i++) {
@@ -327,6 +338,8 @@ public class Loop {
             System.out.println("ДЛЯ СРЕДНЕЙ ОЧЕРЕДИ:" + arr[i]);
             this.avgQueues.set(i, (double) (arr[i] / numOfIterations));
             System.out.println("СРЕДНЯЯ ОЧЕРЕДЬ ЗА " + numOfIterations + " ИТЕРИЦИЙ: " + avgQueues.get(i));
+            this.avgTimes.set(i, new DecimalFormat("#0.0000").format(threads.get(i).getAvgTime()));
+            System.out.println("СРЕДНЕЕ ВРЕМЯ ЗА" + numOfIterations + "ИТЕРАЦИЙ: " + avgTimes.get(i));
         }
         double sumLambda = 0.0;
         for (int i = 0; i < numOfThreads; i++) {
