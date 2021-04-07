@@ -230,7 +230,7 @@ public class Thread implements Cloneable {
         System.out.println(queues.get(0));
         double TIME = 0.0;
         for (int i = 1; i < intensity.getIntervals().size() + 1; i++) {
-            PoissonDistribution pd = new PoissonDistribution(getLambda(), intensity.getIntervals().get(i - 1).getLength());
+            Distribution pd = new PoissonDistribution(getLambda(), intensity.getIntervals().get(i - 1).getLength());
             try {
                 timeForOne = 1/intensity.intensities.get(i-1); // в числителе стоит длина маленького интервала?
                 System.out.println("Время на одну заявку " + timeForOne);
@@ -239,17 +239,17 @@ public class Thread implements Cloneable {
             }
             int maxnum = (int) (intensity.getIntervals().get(i - 1).getLength() / timeForOne); //сколько может обслужиться по максимуму с явным вр обсл
             queues.add(Math.max(0,
-                    queues.get(i - 1) + pd.returnNum(pd.u, pd.intervals) -
+                    queues.get(i - 1) + pd.returnNum(pd.getU(), pd.getIntervals()) -
                             Math.min((int) (intensity.getIntervals().get(i - 1).getLength() * intensity.getIntensities().get(i - 1)), maxnum)));
             for (int j = 0; j < queues.get(i - 1); j++) {
                 all_requests.get(j).addTime(intensity.getIntervals().get(i - 1).getLength()); //TODO заменить на время маленького участка
             }
             System.out.println("в конце этапа старые " + all_requests); //время пребывания
-            for (int j = 0; j < pd.returnNum(pd.u, pd.intervals); j++) {
+            for (int j = 0; j < pd.returnNum(pd.getU(), pd.getIntervals()); j++) {
                 all_requests.add(new Request(1.0)); // TODO заменить на время маленького участка
             }
             System.out.println("в конце этапа новые " + all_requests); // время пребывания
-            realDoneApps.add(Math.min(queues.get(i - 1) + pd.returnNum(pd.u, pd.intervals),
+            realDoneApps.add(Math.min(queues.get(i - 1) + pd.returnNum(pd.getU(), pd.getIntervals()),
                     Math.min((int) (intensity.getIntervals().get(i - 1).getLength() * intensity.getIntensities().get(i - 1)), maxnum)));
             for (int j = 0; j < realDoneApps.get(i - 1); j++) {
                 TIME += all_requests.remove().getTime();
@@ -259,7 +259,7 @@ public class Thread implements Cloneable {
             realDoneAppsStats[i - 1] = realDoneApps.get(i - 1); //+=
 
             maxDoneApps.add(Math.min((int) (intensity.getIntervals().get(i - 1).getLength() * intensity.getIntensities().get(i - 1)), maxnum));
-            System.out.println(queues.get(i - 1) + "+" + pd.returnNum(pd.u, pd.intervals) + "-" + Math.min((int) (intensity.getIntervals().get(i - 1).getLength() * intensity.getIntensities().get(i - 1)), maxnum));
+            System.out.println(queues.get(i - 1) + "+" + pd.returnNum(pd.getU(), pd.getIntervals()) + "-" + Math.min((int) (intensity.getIntervals().get(i - 1).getLength() * intensity.getIntensities().get(i - 1)), maxnum));
         }
         this.queue = queues.get(queues.size() - 1);
         this.realDoneApps = 0;
@@ -290,17 +290,17 @@ public class Thread implements Cloneable {
 
 
     public void createQueueWithoutService() { //результат обслуживание за желтый всет
-        PoissonDistribution pd = new PoissonDistribution(getLambda(), getCurrentTime()); // при loop мы устанавливаем в кач-ве ЗС следующий желтый.
+        Distribution pd = new PoissonDistribution(getLambda(), getCurrentTime()); // при loop мы устанавливаем в кач-ве ЗС следующий желтый.
         for (Request request : all_requests) {
             request.addTime(getCurrentTime());
         }
         System.out.println("Старые заявки на конец света без обслуживания " + all_requests);
-        for (int i = 0; i < pd.returnNum(pd.u, pd.intervals); i++) {
+        for (int i = 0; i < pd.returnNum(pd.getU(), pd.getIntervals()); i++) {
             all_requests.add(new Request(getCurrentTime()));
         }
         System.out.println("Все заявки на конец света без обслуживания" + all_requests);
-        System.out.print(getQueue() + "+" + pd.returnNum(pd.u, pd.intervals) + "=");
-        setQueue(getQueue() + pd.returnNum(pd.u, pd.intervals));
+        System.out.print(getQueue() + "+" + pd.returnNum(pd.getU(), pd.getIntervals()) + "=");
+        setQueue(getQueue() + pd.returnNum(pd.getU(), pd.getIntervals()));
         System.out.println(getQueue());
     }
 

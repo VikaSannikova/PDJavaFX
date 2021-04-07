@@ -1,11 +1,12 @@
 package approximation;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import static java.lang.Math.pow;
 
 //
 // возвращает число, сгенерированное по Пуассону
 //
-public class PoissonDistribution {
+public class PoissonDistribution implements Distribution{
     ArrayList<Integer> a = new ArrayList<>();
     ArrayList<Range> intervals = new ArrayList<>();
     ArrayList<Double> p = new ArrayList<>();
@@ -36,12 +37,15 @@ public class PoissonDistribution {
         return intervals;
     }
 
-    public void setIntervals() {
+    public void setIntervals(){
         intervals = new ArrayList<>(a.size());
-        Range range = new Range(0,p.get(0));
+        Range range = new Range(0, p.get(0));
         intervals.add(range);
-        for(int i = 1; i<a.size(); i++){
-            intervals.add(new Range(intervals.get(i-1).getRight(),intervals.get(i-1).getRight()+p.get(i)));
+        for (int i = 1; i < a.size(); i++) {
+            BigDecimal left = BigDecimal.valueOf(intervals.get(i - 1).getRight());
+            BigDecimal _p = BigDecimal.valueOf(p.get(i));
+            BigDecimal right = left.subtract(_p.negate());
+            intervals.add(new Range(left.doubleValue(), right.doubleValue()));
         }
     }
 
@@ -89,9 +93,9 @@ public class PoissonDistribution {
     }
 
     public int returnNum(double u, ArrayList<Range> ranges){
-        for(int i = 0; i < ranges.size(); i++){
-            if(u>ranges.get(i).getLeft() && u<=ranges.get(i).getRight()) { //равенство с 1 из сторон!!!!
-                return  a.get(i);
+        for (int i = 0; i < ranges.size(); i++) {
+            if (u > ranges.get(i).getLeft() && u <= ranges.get(i).getRight()) { //равенство с 1 из сторон!!!!
+                return a.get(i);
             }
         }
         return 100;
