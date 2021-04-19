@@ -24,7 +24,7 @@ public class Thread implements Cloneable {
     double timeForOne; // время на обслуживание одной заявки
     LinkedList<Request> all_requests;
     double allTimeServedRequests;
-    double avgTime;
+    double avgTime = 0.0;
     int all_requests_in_system;
 
     public LinkedList<Request> getAll_requests() {
@@ -52,7 +52,7 @@ public class Thread implements Cloneable {
         for (int i = 0; i < this.queue; i++) { // время пребывания в очереди у изначальных заявок = 0
             all_requests.add(new Request(0.0));
         }
-        System.out.println("начальное время заявок " + all_requests);
+        System.out.println("начальное время заявок, находящихся в очереди на старте в потоке " + this.id + ": " + all_requests);
         this.allTimeServedRequests = 0.0;
         this.all_requests_in_system = 0;
         this.avgTime = 0.0;
@@ -227,13 +227,12 @@ public class Thread implements Cloneable {
 
         ArrayList<Integer> maxDoneApps = new ArrayList<>(); //за каждый дальта t хранит максимально вохможное число обслуженных заявок
         queues.add(getQueue());
-        System.out.println(queues.get(0));
         double TIME = 0.0;
         for (int i = 1; i < intensity.getIntervals().size() + 1; i++) {
             Distribution pd = new PoissonDistribution(getLambda(), intensity.getIntervals().get(i - 1).getLength());
             try {
                 timeForOne = 1/intensity.intensities.get(i-1); // в числителе стоит длина маленького интервала?
-                System.out.println("Время на одну заявку " + timeForOne);
+                System.out.println("Время на одну заявку на " + (i - 1) + " интервале " + timeForOne);
             }  catch (Exception ex){
                 timeForOne = 0;
             }
@@ -244,17 +243,17 @@ public class Thread implements Cloneable {
             for (int j = 0; j < queues.get(i - 1); j++) {
                 all_requests.get(j).addTime(intensity.getIntervals().get(i - 1).getLength()); //TODO заменить на время маленького участка
             }
-            System.out.println("в конце этапа старые " + all_requests); //время пребывания
+            System.out.println("Время проведенное старыми заявками потока " + this.id + " в системе на конец ЗС     " + all_requests); //время пребывания
             for (int j = 0; j < pd.returnNum(pd.getU(), pd.getIntervals()); j++) {
-                all_requests.add(new Request(1.0)); // TODO заменить на время маленького участка
+                all_requests.add(new Request(intensity.getIntervals().get(i - 1).getLength())); // TODO заменить на время маленького участка
             }
-            System.out.println("в конце этапа новые " + all_requests); // время пребывания
+            System.out.println("Время проведенное всеми(старые + новые) заявками потока " + this.id + " на конец ЗС " + all_requests); // время пребывания
             realDoneApps.add(Math.min(queues.get(i - 1) + pd.returnNum(pd.getU(), pd.getIntervals()),
                     Math.min((int) (intensity.getIntervals().get(i - 1).getLength() * intensity.getIntensities().get(i - 1)), maxnum)));
             for (int j = 0; j < realDoneApps.get(i - 1); j++) {
                 TIME += all_requests.remove().getTime();
             }
-            System.out.println("В конце этапа после обслуживания " + all_requests); // время пребывания
+            System.out.println("После обслуживания в системе остались заявки с такими временами " + all_requests); // время пребывания
             realDoneAppsStats[i - 1] = 0;
             realDoneAppsStats[i - 1] = realDoneApps.get(i - 1); //+=
 
@@ -271,11 +270,80 @@ public class Thread implements Cloneable {
 
             this.maxDoneApps += elem;
         }
-//        if (this.queue != 0) { // это не надо,  оценить очередь нельзя!!!!!!!!!!!
-//            for (Request request : all_requests) {
-//                TIME += request.getTime();
-//            }
-//        }
+        System.out.println("Реально обслуженные заявки по дельтам: " + realDoneApps) ;
+        System.out.println("Обслужилось " + this.realDoneApps + " заявок");
+        System.out.println("Могло быть обслужено " + this.maxDoneApps + " заявок");
+        System.out.println("Общее время заявок которые покинули сисему: " + TIME);
+        System.out.println("Всего(покинули + еще в очереди) в ОУ было замечено заявок: " + (this.realDoneApps + this.queue));
+        allTimeServedRequests +=TIME; // время тех, что вышли из системы
+        all_requests_in_system += this.realDoneApps; //делить на обслуженные
+        if (this.all_requests_in_system != 0) {
+            avgTime = this.allTimeServedRequests /(this.all_requests_in_system);
+        } else {
+            avgTime = 0;
+        }
+        System.out.println("Среднее время пребывания заявок по потоку: " + avgTime);
+    }
+
+
+    public void createQueueWithoutService() { //результат обслуживание за желтый всет
+        Distribution pd = new PoissonDistribution(getLambda(), getCurrentTime()); // при loop мы устанавливаем в кач-ве ЗС следующий желтый.
+        for (Request request : all_requests) {
+            request.addTime(getCurrentTime());
+        }
+        System.out.println("Время проведенное старыми заявками потока " + this.id + " в системе на конец этапа без обслуживания     " + all_requests);
+        for (int i = 0; i < pd.returnNum(pd.getU(), pd.getIntervals()); i++) {
+            all_requests.add(new Request(getCurrentTime()));
+        }
+        System.out.println("Время проведенное всеми(старые + новые) заявками потока " + this.id + " на конец этапа без обслеживания " + all_requests);
+        System.out.print(getQueue() + "+" + pd.returnNum(pd.getU(), pd.getIntervals()) + "=");
+        setQueue(getQueue() + pd.returnNum(pd.getU(), pd.getIntervals()));
+        System.out.println(getQueue());
+    }
+
+    public void createQueueInLoop() {
+        Distribution pd = new PoissonDistribution(getLambda(), getCurrentTime()); // при loop мы устанавливаем в кач-ве ЗС следующий желтый.
+        try {
+            timeForOne = 1/avgIntens; // в числителе стоит длина маленького интервала?
+            System.out.println("Время на одну заявку " + timeForOne);
+        }  catch (Exception ex){
+            timeForOne = 0;
+        }
+        double intensity = getAvgIntens();
+        ArrayList<Integer> realDoneApps = new ArrayList<>();
+        ArrayList<Integer> maxDoneApps = new ArrayList<>();
+        int maxnum = (int) (getCurrentTime() / timeForOne); //сколько может обслужиться по максимуму с явным вр обсл
+        int queue  = Math.max(0, this.getQueue() + pd.returnNum(pd.getU(), pd.getIntervals()) - Math.min((int)(getCurrentTime() * intensity), maxnum));
+
+        for (int i = 0; i < getQueue(); i++) {
+            all_requests.get(i).addTime(getCurrentTime());
+        }
+        System.out.println("в конце этапа старые " + all_requests);
+        for (int i = 0; i < pd.returnNum(pd.getU(), pd.getIntervals()); i++) {
+            all_requests.add(new Request(getCurrentTime()));
+        }
+        System.out.println("в конце этапа новые " + all_requests);
+        realDoneApps.add(Math.min(this.getQueue() + pd.returnNum(pd.getU(), pd.getIntervals()),
+                Math.min((int) (getCurrentTime() * intensity), maxnum)));
+        double TIME = 0.0;
+        for (int j = 0; j < realDoneApps.get(0); j++) {
+            TIME += all_requests.remove().getTime();
+        }
+        System.out.println("В конце этапа после обслуживания " + all_requests); // время пребывания
+        //realDoneAppsStats[i - 1] = 0;
+        //realDoneAppsStats[i - 1] = realDoneApps.get(i - 1); //+=
+
+        maxDoneApps.add(Math.min((int) (getCurrentTime() * intensity), maxnum));
+        System.out.println(queue + "+" + pd.returnNum(pd.getU(), pd.getIntervals()) + "-" + Math.min((int) (getCurrentTime() * intensity), maxnum));
+        this.queue = queue;
+        this.realDoneApps = 0;
+        for (int elem : realDoneApps) {
+            this.realDoneApps += elem;
+        }
+        this.maxDoneApps = 0;
+        for (int elem : maxDoneApps) {
+            this.maxDoneApps += elem;
+        }
         System.out.println("Реально обслуженные заявки по дельтам: ");
         System.out.println(realDoneApps);
         System.out.println("Обслужилось " + this.realDoneApps + " заявок");
@@ -286,22 +354,6 @@ public class Thread implements Cloneable {
         all_requests_in_system += this.realDoneApps; //делить на обслуженные
         avgTime = this.allTimeServedRequests /(this.all_requests_in_system);
         System.out.println("Среднее время пребывания заявок по потоку: " + avgTime);
-    }
-
-
-    public void createQueueWithoutService() { //результат обслуживание за желтый всет
-        Distribution pd = new PoissonDistribution(getLambda(), getCurrentTime()); // при loop мы устанавливаем в кач-ве ЗС следующий желтый.
-        for (Request request : all_requests) {
-            request.addTime(getCurrentTime());
-        }
-        System.out.println("Старые заявки на конец света без обслуживания " + all_requests);
-        for (int i = 0; i < pd.returnNum(pd.getU(), pd.getIntervals()); i++) {
-            all_requests.add(new Request(getCurrentTime()));
-        }
-        System.out.println("Все заявки на конец света без обслуживания" + all_requests);
-        System.out.print(getQueue() + "+" + pd.returnNum(pd.getU(), pd.getIntervals()) + "=");
-        setQueue(getQueue() + pd.returnNum(pd.getU(), pd.getIntervals()));
-        System.out.println(getQueue());
     }
 
 

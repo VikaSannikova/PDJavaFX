@@ -107,8 +107,8 @@ public class MainController {
         yellowTimeColId.setCellValueFactory(new PropertyValueFactory<>("yellowTime"));
 
         threads.add(new Thread(0,0,0.01,10, new Formula("5"),5, 0 ));
-        threads.add(new Thread(1, 10, 0.3, 10, new Formula("-0.6x+7.4"), 5, 9));
-        threads.add(new Thread(2, 40, 1, 10, new Formula("-0.6x+7.4"), 5, 9));
+        threads.add(new Thread(1, 10, 0.3, 10, new Formula("-0.6x+9.4"), 5, 9));
+        threads.add(new Thread(2, 40, 1, 10, new Formula("-0.6x+9.4"), 5, 9));
         threadsTable.setItems(threads);
 
         addButtonId.setOnAction(actionEvent -> {

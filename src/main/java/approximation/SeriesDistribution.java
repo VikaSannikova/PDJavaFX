@@ -2,6 +2,7 @@ package approximation;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 
 public class SeriesDistribution implements Distribution {
@@ -62,6 +63,7 @@ public class SeriesDistribution implements Distribution {
         for (int i = 0; i < size; i++) {
             series[i] = randNumber.nextInt(a.size());
         }
+        System.out.println("Выборка: "+ Arrays.toString(series));
         int[] count = new int[a.size()];
         for (int i = 0; i < 200; i++) {
             count[series[i]] += 1;

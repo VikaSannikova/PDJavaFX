@@ -27,6 +27,7 @@ public class BarChartController {
         barChartId.setTitle("Статистический ряд за целый зеленый свет");
         System.out.println(barChartId.getCategoryGap());
         barChartId.setCategoryGap(1);
-        barChartId.setCategoryGap(1);
+        barChartId.setBarGap(0);
+
     }
 }
